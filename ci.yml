@@ -1,0 +1,59 @@
+name: Run tests on pull request and auto merge dependabot pull requests
+
+on: pull_request
+
+permissions:
+  pull-requests: write
+  issues: write
+  repository-projects: write
+  security-events: write
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "12"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm run test --if-present
+      - name: Get github token
+        if: ${{ success() && github.actor == 'dependabot[bot]' }}
+        uses: dependabot/fetch-metadata@v1
+        id: dependabot-metadata
+        with:
+          alert-lookup: true
+          github-token: "${{ secrets.DEPENDABOT_GITHUB_PAT }}"
+      - name: Merge dependabot PR
+        if: ${{ success() && github.actor == 'dependabot[bot]'}}
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Notify slack on success
+        uses: rtCamp/action-slack-notify@v2
+        if: ${{ success() && github.actor == 'dependabot[bot]' }}
+        env:
+          SLACK_WEBHOOK: ${{secrets.SLACK_WEBHOOK}}
+          SLACK_LINK_NAMES: true
+          SLACK_MESSAGE: "${{ steps.dependabot-metadata.outputs.cvss >= 9 && '@channel' || '' }} Repository ${{github.event.repository.name}} was updated successfully as tests succeeded."
+          SLACK_FOOTER: "Affected dependencies: ${{steps.dependabot-metadata.outputs.dependency-names}}"
+          SLACK_USERNAME: "Dependabot"
+          SLACK_ICON: "https://avatars.githubusercontent.com/u/27347476?s=200&v=4"
+          MSG_MINIMAL: commit
+      - name: Notify slack on failure
+        uses: rtCamp/action-slack-notify@v2
+        if: ${{ failure() && github.actor == 'dependabot[bot]' }}
+        env:
+          SLACK_WEBHOOK: ${{secrets.SLACK_WEBHOOK}}
+          SLACK_LINK_NAMES: true
+          SLACK_MESSAGE: "${{ steps.dependabot-metadata.outputs.cvss >= 9 && '@channel' || ''}} Repository ${{github.event.repository.name}} was not updated due to failing tests."
+          SLACK_FOOTER: "Affected dependencies: ${{steps.dependabot-metadata.outputs.dependency-names}}"
+          SLACK_COLOR: "#FF0000"
+          SLACK_USERNAME: "Dependabot"
+          SLACK_ICON: "https://avatars.githubusercontent.com/u/27347476?s=200&v=4"
+          MSG_MINIMAL: commit
