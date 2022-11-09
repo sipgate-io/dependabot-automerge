@@ -1,7 +1,6 @@
 name: Run tests on pull request and auto merge dependabot pull requests
 
-on: 
-  workflow_call:
+on: workflow_call
 jobs:
   dependabot_automerge:
     runs-on: ubuntu-latest
