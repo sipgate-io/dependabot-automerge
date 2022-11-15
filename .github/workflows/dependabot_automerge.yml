@@ -7,13 +7,17 @@ jobs:
     permissions: write-all
     steps:
       - uses: actions/checkout@v3
+      
       - uses: actions/setup-node@v3
         with:
           node-version: "12"
+      
       - name: Install dependencies
         run: npm ci
+      
       - name: Run tests
         run: npm run test --if-present
+      
       - name: Get github token
         if: ${{ success() && github.actor == 'dependabot[bot]' }}
         uses: dependabot/fetch-metadata@v1
@@ -21,12 +25,18 @@ jobs:
         with:
           alert-lookup: true
           github-token: "${{ secrets.DEPENDABOT_GITHUB_PAT }}"
+      
       - name: Merge dependabot PR
         if: ${{ success() && github.actor == 'dependabot[bot]'}}
-        run: gh pr merge --auto --merge "$PR_URL"
+        uses: nick-fields/retry@v2.8.2
+        with:
+          command: gh pr merge --auto --merge "$PR_URL"
+          max_attempts: 10
+          timeout_seconds: 60
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      
       - name: Notify slack on success
         uses: rtCamp/action-slack-notify@v2
         if: ${{ success() && github.actor == 'dependabot[bot]' }}
@@ -38,6 +48,7 @@ jobs:
           SLACK_USERNAME: "Dependabot"
           SLACK_ICON: "https://avatars.githubusercontent.com/u/27347476?s=200&v=4"
           MSG_MINIMAL: commit
+      
       - name: Notify slack on failure
         uses: rtCamp/action-slack-notify@v2
         if: ${{ failure() && github.actor == 'dependabot[bot]' }}
