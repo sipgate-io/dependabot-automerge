@@ -3,6 +3,7 @@ name: Run tests on pull request and auto merge dependabot pull requests
 on: workflow_call
 jobs:
   tests:
+    concurrency: ${{ github.repository }}
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
