@@ -1,7 +1,5 @@
 name: Run tests on pull request and auto merge dependabot pull requests
 
-concurrency: ${{ github.repository }}
-
 on: workflow_call
 jobs:
   tests:
