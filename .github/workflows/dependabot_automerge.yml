@@ -12,6 +12,14 @@ jobs:
         with:
           node-version: "12"
       
+      - name: Get github token
+        if: ${{ success() && github.actor == 'dependabot[bot]' }}
+        uses: dependabot/fetch-metadata@v1
+        id: dependabot-metadata
+        with:
+          alert-lookup: true
+          github-token: "${{ secrets.DEPENDABOT_GITHUB_PAT }}"
+      
       - name: Install dependencies
         run: npm ci
 
@@ -39,14 +47,6 @@ jobs:
       - name: Run tests for Python
         if: ${{ always() }}
         run: python -m unittest
-        
-      - name: Get github token
-        if: ${{ success() && github.actor == 'dependabot[bot]' }}
-        uses: dependabot/fetch-metadata@v1
-        id: dependabot-metadata
-        with:
-          alert-lookup: true
-          github-token: "${{ secrets.DEPENDABOT_GITHUB_PAT }}"
 
       - name: Merge dependabot PR
         if: ${{ success() && github.actor == 'dependabot[bot]'}}
