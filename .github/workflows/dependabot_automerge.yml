@@ -52,7 +52,11 @@ jobs:
 
       - name: Merge dependabot PR
         if: ${{ success() && github.actor == 'dependabot[bot]'}}
-        run: gh pr merge --auto --merge "$PR_URL"
+        uses: nick-fields/retry@v2.8.2
+        with:
+          command: gh pr merge --auto --merge "$PR_URL"
+          max_attempts: 10
+          timeout_seconds: 60
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
