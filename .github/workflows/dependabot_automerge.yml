@@ -20,10 +20,10 @@ jobs:
         env:
           GH_TOKEN: ${{github.token}}
       
-      - name: Get Maven
+      - name: Get IS_MAVEN
         run: echo "IS_MAVEN=$(if [ -f pom.xml ]; then echo 1; else echo 0; fi)" >> $GITHUB_ENV
 
-      - name: Get Maven
+      - name: Get IS_GRADLE
         run: echo "IS_GRADLE=$(if [ -f build.gradle ]; then echo 1; else echo 0; fi)" >> $GITHUB_ENV
       
       - name: Run tests for NPM
@@ -37,10 +37,10 @@ jobs:
       - name: Run tests for Java (Gradle)
         if: env.IS_GRADLE == 1 && env.PRIMARY_LANG == 'Java'
         run: ./gradlew test
-      
-      - name: Is Success
-        if: ${{ success() }}
-        run: echo "success"
+        
+      - name: Run tests for Python
+        if: env.PRIMARY_LANG == 'Python'
+        run: python -m unittest
 
       - name: Get github token
         if: ${{ success() && github.actor == 'dependabot[bot]' }}
