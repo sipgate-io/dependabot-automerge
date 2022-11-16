@@ -16,7 +16,7 @@ jobs:
         run: npm ci
       
       - name: Run tests
-        run: npm run test --if-present
+        run: node test.js
       
       - name: Get github token
         if: ${{ success() && github.actor == 'dependabot[bot]' }}
@@ -25,14 +25,10 @@ jobs:
         with:
           alert-lookup: true
           github-token: "${{ secrets.DEPENDABOT_GITHUB_PAT }}"
-      
+
       - name: Merge dependabot PR
         if: ${{ success() && github.actor == 'dependabot[bot]'}}
-        uses: nick-fields/retry@v2.8.2
-        with:
-          command: gh pr merge --auto --merge "$PR_URL"
-          max_attempts: 10
-          timeout_seconds: 60
+        run: gh pr merge --auto --merge "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
