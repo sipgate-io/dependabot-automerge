@@ -33,31 +33,19 @@ jobs:
         if: env.IS_NPM == 1
         run: npm test --if-present
         
-      - name: NPM success
-        run: echo "NPM_SUCCESS=${{ success() }}" >> $GITHUB_ENV
-
       - name: Run tests for Java (Maven)
         if: env.IS_MAVEN == 1
         run: mvn test
         
-      - name: Java (Maven) success
-        run: echo "MAVEN_SUCCESS=${{ success() }}" >> $GITHUB_ENV
-
       - name: Run tests for Java (Gradle)
         if: env.IS_GRADLE == 1
         run: ./gradlew test
         
-      - name: Java (Gradle) success
-        run: echo "GRADLE_SUCCESS=${{ success() }}" >> $GITHUB_ENV
-        
       - name: Run tests for Python
         run: python -m unittest
         
-      - name: Python success
-        run: echo "PYTHON_SUCCESS=${{ success() }}" >> $GITHUB_ENV
-
       - name: Get github token
-        if: ${{ github.actor == 'dependabot[bot]' && env.NPM_SUCCESS && env.MAVEN_SUCCESS && env.GRADLE_SUCCESS && env.PYTHON_SUCCESS }}
+        if: ${{ success() && github.actor == 'dependabot[bot]' }}
         uses: dependabot/fetch-metadata@v1
         id: dependabot-metadata
         with:
