@@ -24,9 +24,6 @@ jobs:
       - name: Get IS_GRADLE
         run: echo "IS_GRADLE=$(if [ -f build.gradle ]; then echo 1; else echo 0; fi)" >> $GITHUB_ENV
       
-      - name: Test
-        run: echo "IS_NPM=$IS_NPM, IS_MAVEN=$IS_MAVEN, IS_GRADLE=$IS_GRADLE"
-      
       - name: Run tests for NPM
         if: env.IS_NPM == 1
         run: npm test --if-present
