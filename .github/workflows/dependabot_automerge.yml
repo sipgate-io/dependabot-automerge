@@ -28,6 +28,9 @@ jobs:
 
       - name: Get IS_GRADLE
         run: echo "IS_GRADLE=$(if [ -f build.gradle ]; then echo 1; else echo 0; fi)" >> $GITHUB_ENV
+        
+      - name: Get IS_PYTHON
+        run: echo "IS_PYTHON=$(if [ -f requirements.txt ]; then echo 1; else echo 0; fi)" >> $GITHUB_ENV
       
       - name: Install NPM dependencies
         if: env.IS_NPM == 1
@@ -44,7 +47,11 @@ jobs:
       - name: Run tests for Java (Gradle)
         if: ${{ always() && env.IS_GRADLE == 1 }}
         run: ./gradlew test
-        
+      
+      - name: Install Python requirements
+        if: ${{ always() && env.IS_PYTHON == 1 }}
+        run: pip install -r requirements.txt
+      
       - name: Run tests for Python
         if: ${{ always() }}
         run: python -m unittest
