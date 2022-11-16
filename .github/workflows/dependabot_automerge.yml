@@ -16,13 +16,12 @@ jobs:
         run: npm ci
       
       - name: Get primary language
-        # run: LANG=$(gh repo view --json primaryLanguage -q '.primaryLanguage.name')
-        run: gh repo view --json primaryLanguage -q '.primaryLanguage.name'
+        run: echo "PRIMARY_LANG=$(gh repo view --json primaryLanguage -q '.primaryLanguage.name')" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{github.token}}
       
-      # - name: Run tests
-      #   run: echo $LANG
+      - name: Run tests
+        run: echo $PRIMARY_LANG
       
       - name: Get github token
         if: ${{ success() && github.actor == 'dependabot[bot]' }}
