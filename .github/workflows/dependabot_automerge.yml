@@ -34,14 +34,15 @@ jobs:
         run: npm test --if-present
         
       - name: Run tests for Java (Maven)
-        if: env.IS_MAVEN == 1
+        if: ${{ always() }} && env.IS_MAVEN == 1
         run: mvn test
         
       - name: Run tests for Java (Gradle)
-        if: env.IS_GRADLE == 1
+        if: ${{ always() }} && env.IS_GRADLE == 1
         run: ./gradlew test
         
       - name: Run tests for Python
+        if: ${{ always() }}
         run: python -m unittest
         
       - name: Get github token
