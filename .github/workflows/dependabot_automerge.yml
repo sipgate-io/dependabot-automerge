@@ -16,7 +16,9 @@ jobs:
         run: npm ci
       
       - name: Get primary language
-        run: LANG=$(gh repo view sipgate-io/mastermind --json primaryLanguage -q '.primaryLanguage.name')
+        run: LANG=$(gh repo view --json primaryLanguage -q '.primaryLanguage.name')
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       
       - name: Run tests
         run: echo $LANG
