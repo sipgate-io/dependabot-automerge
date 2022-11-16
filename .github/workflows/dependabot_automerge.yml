@@ -15,8 +15,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      - name: Get primary language
+        run: LANG=$(gh repo view sipgate-io/mastermind --json primaryLanguage -q '.primaryLanguage.name')
+      
       - name: Run tests
-        run: node test.js
+        run: echo $LANG
       
       - name: Get github token
         if: ${{ success() && github.actor == 'dependabot[bot]' }}
