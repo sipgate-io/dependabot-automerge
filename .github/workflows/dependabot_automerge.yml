@@ -69,7 +69,7 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{secrets.SLACK_WEBHOOK}}
           SLACK_LINK_NAMES: true
-          SLACK_MESSAGE: "${{ steps.dependabot-metadata.outputs.cvss >= 9 && '@channel' || '' }} Repository ${{github.event.repository.name}} was updated successfully as tests succeeded."
+          SLACK_MESSAGE: "Repository ${{github.event.repository.name}} was updated successfully as tests succeeded."
           SLACK_FOOTER: "Affected dependencies: ${{steps.dependabot-metadata.outputs.dependency-names}}"
           SLACK_USERNAME: "Dependabot"
           SLACK_ICON: "https://avatars.githubusercontent.com/u/27347476?s=200&v=4"
