@@ -20,9 +20,28 @@ jobs:
         env:
           GH_TOKEN: ${{github.token}}
       
-      - name: Run tests
-        run: echo $PRIMARY_LANG
+      - name: Get Maven
+        run: echo "IS_MAVEN=$(if [ -f pom.xml ]; then echo 1; else echo 0; fi)" >> $GITHUB_ENV
+
+      - name: Get Maven
+        run: echo "IS_GRADLE=$(if [ -f build.gradle ]; then echo 1; else echo 0; fi)" >> $GITHUB_ENV
       
+      - name: Run tests for NPM
+        if: env.PRIMARY_LANG == "TypeScript" || env.PRIMARY_LANG == "JavaScript"
+        run: npm test --if-present
+
+      - name: Run tests for Java (Maven)
+        if: env.IS_MAVEN == 1 && env.PRIMARY_LANG == "Java"
+        run: mvn test
+
+      - name: Run tests for Java (Gradle)
+        if: env.IS_GRADLE == 1 && env.PRIMARY_LANG == "Java"
+        run: ./gradlew test
+      
+      - name: Is Success
+        if: ${{ success() }}
+        run: echo "success"
+
       - name: Get github token
         if: ${{ success() && github.actor == 'dependabot[bot]' }}
         uses: dependabot/fetch-metadata@v1
